@@ -16,19 +16,22 @@ http.createServer((request, response) => {
     if (err) {
       console.log(err);
     } else {
-      console.log('Added to log.');
+      console.log('Added to log.' + filepath);
     }
   });
 
-  if(q.pathname.includes('documentation'))
+  if(q.pathname.includes('documentation.html'))
   {
-      filepath = (__dirname + '/documenation.html');}
+      filepath = (__dirname + '/documentation.html');
+      console.log(filepath);
+    
+    }
       else {
         filepath = 'index.html';
       }
 
 
-      fs.readFile(filePath, (err, data) => {
+      fs.readFile(filepath, (err, data) => {
         if (err) {
           throw err;
         }
