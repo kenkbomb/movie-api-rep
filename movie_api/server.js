@@ -20,7 +20,7 @@ http.createServer((request, response) => {
     }
   });
 
-  if(q.pathname.includes('documentation.html'))
+  if(q.pathname.includes('documentation'))
   {
       filepath = (__dirname + '/documentation.html');
       console.log(filepath);
