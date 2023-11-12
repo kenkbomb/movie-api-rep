@@ -3,8 +3,8 @@ const http = require('http');
 const fs = require('fs');
 
 http.createServer((request, response) => {
-  response.writeHead(200, {'Content-Type': 'text/plain'});
-  response.end('Hello Node!\n');
+  // response.writeHead(200, {'Content-Type': 'text/plain'});
+  // response.end('Hello Node!\n');
   let addr = request.url;
   let q = new URL(addr,'http://localhost:8080');
   let filepath = '';
@@ -12,10 +12,12 @@ http.createServer((request, response) => {
 
   
 
-  fs.appendFile('log.txt', 'URL: ' + addr + '\nTimestamp: ' + new Date() + '\n\n', (err) => {
+  fs.appendFile('log.txt', 'URL: ' + addr + '\nTimestamp: ' + new Date() + '\n\n', (err) => 
+  {
     if (err) {
       console.log(err);
-    } else {
+    }
+     else {
       console.log('Added to log.' + filepath);
     }
   });
@@ -24,11 +26,11 @@ http.createServer((request, response) => {
   {
       filepath = (__dirname + '/documentation.html');
       console.log(filepath);
-    
-    }
-      else {
+  }
+      else
+       {
         filepath = 'index.html';
-      }
+       }
 
 
       fs.readFile(filepath, (err, data) => {
@@ -42,8 +44,6 @@ http.createServer((request, response) => {
     
       });
       
-
- 
 }).listen(8080);
 
 console.log('My first Node test server is running on Port 8080.');
