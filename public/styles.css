@@ -1,0 +1,24 @@
+
+body{
+    text-transform: capitalize;
+}
+th:nth-child(odd){
+background-color: aquamarine;
+}
+th:nth-child(even){
+    background-color: rgb(129, 186, 235);
+}
+th{
+    /* margin-right: 10px; */
+    padding: 5px;
+}
+
+td{
+    text-align: center;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+table,th,td{
+    border:1px solid;
+    border-collapse: collapse;
+}
