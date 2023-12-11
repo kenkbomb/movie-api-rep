@@ -124,7 +124,10 @@ app.post('/users',(req,res)=>
 //adds a new user
 res.send('add a new user');
 });
-
+app.delete('/users',(req,res)=>
+{
+    res.send('deletes a user');
+});
 app.put('/users',(req,res)=>
 {
 //allows user to update their username

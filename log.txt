@@ -318,3 +318,8 @@ Timestamp: Wed Nov 22 2023 14:59:32 GMT-0500 (Eastern Standard Time)
 ::ffff:127.0.0.1 - - [11/Dec/2023:04:21:23 +0000] "GET /styles.css HTTP/1.1" 200 378 "http://127.0.0.1:8080/documentation.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
 ::ffff:127.0.0.1 - - [11/Dec/2023:04:46:55 +0000] "GET /documentation.html HTTP/1.1" 200 1569 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
 ::ffff:127.0.0.1 - - [11/Dec/2023:04:46:55 +0000] "GET /styles.css HTTP/1.1" 304 - "http://127.0.0.1:8080/documentation.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
+::ffff:127.0.0.1 - - [11/Dec/2023:05:48:29 +0000] "PATCH /users HTTP/1.1" 404 146 "-" "PostmanRuntime/7.35.0"
+::ffff:127.0.0.1 - - [11/Dec/2023:05:49:29 +0000] "PUT /users HTTP/1.1" 200 36 "-" "PostmanRuntime/7.35.0"
+::ffff:127.0.0.1 - - [11/Dec/2023:05:58:44 +0000] "DELETE /users HTTP/1.1" 200 14 "-" "PostmanRuntime/7.35.0"
+::ffff:127.0.0.1 - - [11/Dec/2023:05:59:03 +0000] "DELETE /users/movies HTTP/1.1" 200 35 "-" "PostmanRuntime/7.35.0"
+::ffff:127.0.0.1 - - [11/Dec/2023:05:59:58 +0000] "POST /users/movies HTTP/1.1" 200 34 "-" "PostmanRuntime/7.35.0"
