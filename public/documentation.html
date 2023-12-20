@@ -7,7 +7,7 @@
     <link rel = 'stylesheet' href = './styles.css'>
 </head>
 <body>
-    <h1>API Documentation</h1>
+    <h1>Kens Movie API Documentation</h1>
     <div>
 <table>
 <tr>
@@ -35,6 +35,15 @@
     <td>JSON</td>
 </tr>
 <tr>
+    <td>show all users</td>
+    <td>/users</td>
+    <td>GET</td>
+    <td>none</td>
+    <td>JSON</td>
+
+</tr>
+
+<tr>
     <td>return a movie by title</td>
     <td>/movies/:title</td>
     <td>GET</td>
@@ -42,8 +51,15 @@
     <td>JSON</td>
 </tr>
 <tr>
+    <td>return a user by name</td>
+    <td>/users/:user</td>
+    <td>GET</td>
+    <td>STRING</td>
+    <td>JSON</td>
+</tr>
+<tr>
     <td>add a new movie</td>
-    <td>/users/movies</td>
+    <td>/movies</td>
     <td>POST</td>
     <td>JSON</td>
     <td>none</td>
@@ -56,26 +72,27 @@
     <td>none</td>
 </tr>
 <tr>
-    <td>remove a user</td>
-    <td>/users</td>
+    <td>remove a movie from a users favorites list</td>
+    <td>/users/:Username</td>
     <td>DELETE</td>
     <td>STRING</td>
     <td>none</td>
 </tr>
 <tr>
     <td>update user info</td>
-    <td>/users</td>
+    <td>/users/:Username</td>
     <td>PUT</td>
     <td>STRING</td>
     <td>none</td>
 </tr>
 <tr>
-    <td>remove a movie from a users list</td>
-    <td>/users/movies</td>
-    <td>DELETE</td>
+    <td>update a movie</td>
+    <td>/movies/:Title</td>
+    <td>PUT</td>
     <td>STRING</td>
     <td>none</td>
 </tr>
+
 
 </table>
 
