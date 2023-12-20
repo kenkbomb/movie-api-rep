@@ -145,19 +145,42 @@ app.get('/users',async(req,res)=>
 {
     await USERS.find().then((users)=>
     {
-        res.status(201).json(users);
-    }).catch((err)=>{console.error(err);
+        res.json(users);
+    }).catch((err)=>{
+        console.error(err);
         res.status(500).send('Error' + err);
     }
     )
    });
 //----------------------------------------------------------------------
 
-app.post('/movies',(req,res)=>
+app.post('/movies',async(req,res)=>
 {
-//posts a new movie
-res.send('add a new movie');
-});
+    await MOVIES.findOne({Title:req.body.Title}).then((movie)=>
+    {
+        if(movies)
+        {
+            return res.status(400).send(req.body.Title + 'already exists!');
+        }
+        else {
+    
+    
+     MOVIES.create({
+        Title:req.body.Title,
+        Director:req.body.Director,Genre:req.body.Genre,Release:req.body.Release,Tagline:req.body.Tagline,Imagepath:req.body.Imagepath,Description:req.body.Description
+    }).then((movie)=>
+    {
+        res.json(movie);   
+    }).catch((err)=>
+    {
+        console.error(err);
+        res.status(400).send('Error ' + err);
+    }
+    )
+}
+})
+})
+;
 //-----------------------------------------------------------------------------------------------------
 
 //below, adds a new MOVIE to a USERS 'favorites'...-----------------------------------------------------
@@ -233,17 +256,11 @@ app.post('/users',async(req,res)=>
 });
 //------------------------------------------------------------------------------------------------
 
-//below, deletes a USER by ...
-app.delete('/users',(req,res)=>
-{
-    res.send('deletes a user');
-});
-//------------------------------------------------------------------------------------------------
 
 //below, updates a USER by name...---------------------------------------------------------------------
 app.put('/users/:Username',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Username},{$set:{Username:req.body.username,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
+    await USERS.findOneAndUpdate({Username:req.params.Username},{$set:{Username:req.body.Username,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
     {
         console.error(err);
         res.status(500).send('Error ' + err);
@@ -254,7 +271,7 @@ app.put('/users/:Username',async(req,res)=>
 //below, updates a MOVIE by title...--------------------------------------------------------------
 app.get('/movies/:Title',async(req,res)=>
 {
-    await findOneAndUpdate({Title:req.params.Title},{$set:{Title:req.body.Title,Director:req.body.Director,Genre:req.body.genre,Release:req.body.release,Tagline:req.body.Tagline,Description:req.body.Description}}).then((movie)=>
+    await findOneAndUpdate({Title:req.params.Title},{$set:{Title:req.body.Title,Director:req.body.Director,Genre:req.body.Genre,Release:req.body.Release,Tagline:req.body.Tagline,Description:req.body.Description}}).then((movie)=>
     {
         if(!movie)
         {
@@ -270,6 +287,7 @@ app.get('/movies/:Title',async(req,res)=>
             res.status(500).send('Error ' + err);
         })
 })
+//------------------------------------------------------------------------------------------------------------
 app.get('/documentation',(req,res)=>
 {
 
