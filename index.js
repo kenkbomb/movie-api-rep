@@ -153,7 +153,7 @@ app.delete('/movies/:Title',async(req,res)=>
 //-------------------------------------------------------------------------------------------------------
 
 //below, delete a movie/favorite from a USERS file...----------------------------------
-app.post('/users/:Username/movies/:MovieID',async(req,res)=>
+app.put('/users/:Username/movies/:MovieID',async(req,res)=>
 {
     await USERS.findOneAndUpdate({Username:req.params.Username},{$pop:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
     {
