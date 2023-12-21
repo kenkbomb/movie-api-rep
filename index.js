@@ -26,6 +26,7 @@ app.get('/',(req,res)=>
 {
     res.send('hi, welcome to Kens movie night!');
 });//--------------------------------------------------------------------
+
 //below, get a MOVIE by title
 app.get('/movies/:Title',async(req,res)=>
 {
@@ -152,9 +153,17 @@ app.delete('/movies/:Title',async(req,res)=>
 //-------------------------------------------------------------------------------------------------------
 
 //below, delete a movie/favorite from a USERS file...----------------------------------
-app.delete('/users/movies',(req,res)=>
+app.post('/users/:Username/movies/:MovieID',async(req,res)=>
 {
-    res.send('delete a movie from this users file');
+    await USERS.findOneAndUpdate({Username:req.params.Username},{$pop:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
+    {
+        res.json(user);
+    }).catch((err)=>
+    {
+        console.error(err);
+        res.status(500).send('Error ' + err);
+    })
+    
 });
 
 //below, adds a NEW USER...--------------------------------------------------------------
