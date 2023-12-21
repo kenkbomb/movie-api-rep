@@ -5,98 +5,31 @@ const uuid = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { default: mongoose } = require('mongoose');
+// const { default: mongoose } = require('mongoose');
 const app = express();
 const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const models = require('./public/models');
 
 const MOVIES = models.Movie;
 const USERS = models.User;
 
-mongoose.connect('mongodb://localhost:27017/myFlexDB', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 app.use(morgan('combined', {stream: logStream}));
 // app.use(bodyParser.json());
 
-let topMovies = [
-{
-    Title:'Blade Runner 2049',
-    Director:'Denis Villenueve',
-    year: '2017',
-    genre:'science fiction'
-},
-{
-    Title:'Batman Forever',
-    Director:'Joel Schumacher',
-    year:'1998',
-    genre:'thriller'
-},
-{
-    Title:'The Highlander',
-    Director:'Russel Mulcahy',
-    year:'1986',
-    genre:'action/fantasy'
-},
-{
-    Title:'Night of the Living Dead',
-    Director:'George A Romero',
-    year: '1968',
-    genre:'horror'
-},
-{
-    Title:'Dumb and Dumber',
-    Director: 'Peter Farrelly',
-    year:'1994',
-    genre:'comedy'
-},
-{
-    Title:'Taxi Driver',
-    Director: 'Martin Scorsecse',
-    year: '1976',
-    genre:'drama'
-},
-{
-    Title:'Rocky 3',
-    Director: 'Slyvester Stallone',
-    year: '1979',
-    genre:'drama'
-},
-{
-    Title: 'Masters of the universe',
-    Director: 'Gary Goddard',
-    year: '1987',
-    genre:'action'
-},
-{
-    Title: 'Fist of the North Star',
-    Director:'Toyoo Ashida',
-    year: '1986',
-    genre:'anime'
-},
-{
-    Title: 'M3GAN',
-    Director:'Gerard Johnstone',
-    year:'2022',
-    genre:'horror'
-},
-{
-    Title:'The Shining',
-    Director:'Stanley Kubrick',
-    year:'1978',
-    genre:'horror'
-}
-];
+
 // home page..-----------------------------------------------------------
 app.get('/',(req,res)=>
 {
     res.send('hi, welcome to Kens movie night!');
 });//--------------------------------------------------------------------
-//below,get a MOVIE by title
+//below, get a MOVIE by title
 app.get('/movies/:Title',async(req,res)=>
 {
-    await MOVIES.findOne({Title:MOVIES.params.Title}).then((movie)=>
+    await MOVIES.findOne({Title:req.params.Title}).then((movie)=>
     {
         res.json(movie);
     }).catch((err)=>
