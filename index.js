@@ -1,11 +1,12 @@
 const express = require('express');
 const morgan = require('morgan');
 const uuid = require('uuid');
-// const bparser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
-// const { default: mongoose } = require('mongoose');
+//let auth = require('./auth')(app);
+//const passport = require('passport');
+//require('./passport');
 const app = express();
 const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});
 const mongoose = require('mongoose');
@@ -61,9 +62,9 @@ app.get('/tests',(req,res)=>
 //---------------------------------------------------------------------
 
 //below,gets a USER by name...-------------------------------------------------------
-app.get('/users/:username',async(req,res)=>
+app.get('/users/:Name',async(req,res)=>
 {
-    await USERS.findOne({Username:req.params.Username}).then((user)=>
+    await USERS.findOne({Name:req.params.Name}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -87,6 +88,7 @@ app.get('/users',async(req,res)=>
     )
    });
 //----------------------------------------------------------------------
+//below, post a new movie...
 
 app.post('/movies',async(req,res)=>
 {
@@ -118,9 +120,9 @@ app.post('/movies',async(req,res)=>
 //-----------------------------------------------------------------------------------------------------
 
 //below, adds a new MOVIE to a USERS 'favorites'...-----------------------------------------------------
-app.post('/users/:Username/movies/:MovieID',async(req,res)=>
+app.post('/users/:Name/movies/:MovieID',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Username},{$push:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
+    await USERS.findOneAndUpdate({Name:req.params.Name},{$push:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -134,7 +136,7 @@ app.post('/users/:Username/movies/:MovieID',async(req,res)=>
 //below, deletes a MOVIE by name...----------------------------------------------------
 app.delete('/movies/:Title',async(req,res)=>
 {
-    await MOVIES.findOneAndRemove({Title:req.params.Title}).then((movie)=>
+    await MOVIES.findOneAndDelete({Title:req.params.Title}).then((movie)=>
     {
         if(!movie)
         {
@@ -151,11 +153,31 @@ app.delete('/movies/:Title',async(req,res)=>
 
 });
 //-------------------------------------------------------------------------------------------------------
-
-//below, delete a movie/favorite from a USERS file...----------------------------------
-app.put('/users/:Username/movies/:MovieID',async(req,res)=>
+//below, deletes and user by name...
+app.delete('/users/:Name',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Username},{$pop:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
+    await USERS.findOneAndDelete({Name:req.params.Name}).then((user)=>
+    {
+        if(!user)
+        {
+            res.status(400).send(req.params.Name + ' not found!');
+        }
+        if(user)
+        {
+            res.status(200).send(req.params.Name + ' has been removed');
+        }
+    }).catch(err=>
+        {
+            console.error(err);
+            res.status(500).send('Error '+ err);
+        })
+    })
+//-------------------------------------------------------------------------------------------------------
+
+//below, delete a movie/favorite from a USERS favorites...----------------------------------
+app.put('/users/:Name/movies/:MovieID',async(req,res)=>
+{
+    await USERS.findOneAndUpdate({Name:req.params.Name},{$pop:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -167,42 +189,49 @@ app.put('/users/:Username/movies/:MovieID',async(req,res)=>
 });
 
 //below, adds a NEW USER...--------------------------------------------------------------
-app.post('/users',async(req,res)=>
-{
-    await USERS.findOne({Username:req.body.Username})
-   .then((user)=>
-   {
-    if(user)
-    {
-        return res.status(400).send(req.Username + 'already exists!');
-    }
-    else{
-        users.create({
-            Username:req.body.Username,
-            Password:req.body.Password,
-            Email:req.body.Email,
-            Birthday:req.body.Birthday
-        }).then((user)=>{
-            res.status(201).json(user)}).catch((error)=>
-            {
-                console.error(error);
-                res.status(500).send('Error ' + error);
-            })
-        }
+
+app.post('/users', async (req, res) => {
+  await USERS.findOne({ Name:req.body.Name })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.Name + 'already exists');
+      } else {
+        USERS
+          .create({
+            Name: req.body.Name,
+            Password: req.body.Password,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday
+          })
+          .then((user) =>{res.status(201).json(user) })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send('Error: ' + error);
+        })
+      }
     })
-    
     .catch((error) => {
-        console.error(error);
-        res.status(500).send('Error: ' + error);
-      });
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    });
 });
+
+
+
+     
+        
+        
+    
+
+    
+    
 //------------------------------------------------------------------------------------------------
 
 
 //below, updates a USER by name...---------------------------------------------------------------------
-app.put('/users/:Username',async(req,res)=>
+app.put('/users/:Name',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Username},{$set:{Username:req.body.Username,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
+    await USERS.findOneAndUpdate({Name:req.params.Name},{$set:{Name:req.body.Name,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
     {
         console.error(err);
         res.status(500).send('Error ' + err);
@@ -211,9 +240,9 @@ app.put('/users/:Username',async(req,res)=>
 });
 //------------------------------------------------------------------------------------------------
 //below, updates a MOVIE by title...--------------------------------------------------------------
-app.get('/movies/:Title',async(req,res)=>
+app.put('/movies/:Title',async(req,res)=>
 {
-    await findOneAndUpdate({Title:req.params.Title},{$set:{Title:req.body.Title,Director:req.body.Director,Genre:req.body.Genre,Release:req.body.Release,Tagline:req.body.Tagline,Description:req.body.Description}}).then((movie)=>
+    await MOVIES.findOneAndUpdate({Title:req.params.Title},{$set:{Title:req.body.Title,Director:req.body.Director,Genre:req.body.Genre,Release:req.body.Release,Tagline:req.body.Tagline,Description:req.body.Description}}).then((movie)=>
     {
         if(!movie)
         {
