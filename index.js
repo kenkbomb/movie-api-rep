@@ -4,10 +4,14 @@ const uuid = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
+
 //let auth = require('./auth')(app);
 //const passport = require('passport');
 //require('./passport');
+
 const app = express();
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true }));
 const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});
 const mongoose = require('mongoose');
 const models = require('./public/models');
@@ -17,9 +21,8 @@ const USERS = models.User;
 
 mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
-
 app.use(morgan('combined', {stream: logStream}));
-// app.use(bodyParser.json());
+
 
 
 // home page..-----------------------------------------------------------
@@ -27,6 +30,35 @@ app.get('/',(req,res)=>
 {
     res.send('hi, welcome to Kens movie night!');
 });//--------------------------------------------------------------------
+
+//below, adds a NEW USER...--------------------------------------------------------------
+
+app.post('/users', async (req, res) => {
+    await USERS.findOne({ Name:req.body.Name })
+      .then((user) => {
+        if (user) {
+          return res.status(400).send(req.body.Name + 'already exists');
+        } else {
+          USERS
+            .create({
+              Name: req.body.Name,
+              Password: req.body.Password,
+              Email: req.body.Email,
+              Birthday: req.body.Birthday
+            })
+            .then((user) =>{res.status(201).json(user) })
+          .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+          })
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send('Error: ' + error);
+      });
+  });//------------------------------------------------------------------------------------------------
+
 
 //below, get a MOVIE by title
 app.get('/movies/:Title',async(req,res)=>
@@ -87,23 +119,27 @@ app.get('/users',async(req,res)=>
     }
     )
    });
-//----------------------------------------------------------------------
-//below, post a new movie...
+//------------------------------------------------------------------------------------------------
 
+
+//below, post a new movie...----------------------------------------------------------------------
 app.post('/movies',async(req,res)=>
 {
     await MOVIES.findOne({Title:req.body.Title}).then((movie)=>
     {
-        if(movies)
+        if(movie)
         {
             return res.status(400).send(req.body.Title + 'already exists!');
         }
         else {
-    
-    
-     MOVIES.create({
+    MOVIES.create({
         Title:req.body.Title,
-        Director:req.body.Director,Genre:req.body.Genre,Release:req.body.Release,Tagline:req.body.Tagline,Imagepath:req.body.Imagepath,Description:req.body.Description
+        Director:req.body.Director,
+        Genre:req.body.Genre,
+        Release:req.body.Release,
+        Tagline:req.body.Tagline,
+        Imagepath:req.body.Imagepath,
+        Description:req.body.Description
     }).then((movie)=>
     {
         res.json(movie);   
@@ -120,9 +156,9 @@ app.post('/movies',async(req,res)=>
 //-----------------------------------------------------------------------------------------------------
 
 //below, adds a new MOVIE to a USERS 'favorites'...-----------------------------------------------------
-app.post('/users/:Name/movies/:MovieID',async(req,res)=>
+app.put('/users/:Name/favs/',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Name:req.params.Name},{$push:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
+    await USERS.findOneAndUpdate({Name:req.params.Name},{$push:{Favorites:req.body.MovieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -174,10 +210,10 @@ app.delete('/users/:Name',async(req,res)=>
     })
 //-------------------------------------------------------------------------------------------------------
 
-//below, delete a movie/favorite from a USERS favorites...----------------------------------
-app.put('/users/:Name/movies/:MovieID',async(req,res)=>
+//below, delete a movie/favorite from a USERS favorites...------------------------------------------
+app.delete('/users/:Name/favs/:movieID',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Name:req.params.Name},{$pop:{Favorites:req.params.MovieID}},{new:true}).then((user)=>
+    await USERS.findOneAndUpdate({Name:req.params.Name},{$pull:{Favorites:req.params.movieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -188,45 +224,8 @@ app.put('/users/:Name/movies/:MovieID',async(req,res)=>
     
 });
 
-//below, adds a NEW USER...--------------------------------------------------------------
 
-app.post('/users', async (req, res) => {
-  await USERS.findOne({ Name:req.body.Name })
-    .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.Name + 'already exists');
-      } else {
-        USERS
-          .create({
-            Name: req.body.Name,
-            Password: req.body.Password,
-            Email: req.body.Email,
-            Birthday: req.body.Birthday
-          })
-          .then((user) =>{res.status(201).json(user) })
-        .catch((error) => {
-          console.error(error);
-          res.status(500).send('Error: ' + error);
-        })
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
-    });
-});
-
-
-
-     
-        
-        
-    
-
-    
-    
-//------------------------------------------------------------------------------------------------
-
+//----------------------------------------------------------------------------------------------------
 
 //below, updates a USER by name...---------------------------------------------------------------------
 app.put('/users/:Name',async(req,res)=>
