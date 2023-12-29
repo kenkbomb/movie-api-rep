@@ -24,8 +24,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, 
 app.use(morgan('combined', {stream: logStream}));
 
 let auth = require('./auth')(app);
-const passport = require('./passport');
-require('passport');
+const passport = require('passport');
+require('./passport');
 //const passportLocal =  require('passport-local');
 
 //Above, declares, reqs and setup...
@@ -44,14 +44,14 @@ app.get('/',(req,res)=>
 //below, adds a NEW USER...--------------------------------------------------------------
 
 app.post('/users', async (req, res) => {
-    await USERS.findOne({ Name:req.body.Name })
+    await USERS.findOne({ Username:req.body.Name })
       .then((user) => {
         if (user) {
-          return res.status(400).send(req.body.Name + 'already exists');
+          return res.status(400).send(req.body.Name + ' already exists');
         } else {
           USERS
             .create({
-              Name: req.body.Name,
+              Username: req.body.Name,
               Password: req.body.Password,
               Email: req.body.Email,
               Birthday: req.body.Birthday
@@ -97,6 +97,7 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), async(req,r
     
 });
 //---------------------------------------------------------------------
+//below, just a test endpoint...
 app.get('/tests',(req,res)=>
 {
     res.send('test here');
@@ -106,7 +107,7 @@ app.get('/tests',(req,res)=>
 //below,gets a USER by name...-------------------------------------------------------
 app.get('/users/:Name',async(req,res)=>
 {
-    await USERS.findOne({Name:req.params.Name}).then((user)=>
+    await USERS.findOne({Username:req.params.Name}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -168,7 +169,7 @@ app.post('/movies',async(req,res)=>
 //below, adds a new MOVIE to a USERS 'favorites'...-----------------------------------------------------
 app.put('/users/:Name/favs/',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Name:req.params.Name},{$push:{Favorites:req.body.MovieID}},{new:true}).then((user)=>
+    await USERS.findOneAndUpdate({Username:req.params.Name},{$push:{Favorites:req.body.MovieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -202,7 +203,7 @@ app.delete('/movies/:Title',async(req,res)=>
 //below, deletes and user by name...
 app.delete('/users/:Name',async(req,res)=>
 {
-    await USERS.findOneAndDelete({Name:req.params.Name}).then((user)=>
+    await USERS.findOneAndDelete({Username:req.params.Name}).then((user)=>
     {
         if(!user)
         {
@@ -223,7 +224,7 @@ app.delete('/users/:Name',async(req,res)=>
 //below, delete a movie/favorite from a USERS favorites...------------------------------------------
 app.delete('/users/:Name/favs/:movieID',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Name:req.params.Name},{$pull:{Favorites:req.params.movieID}},{new:true}).then((user)=>
+    await USERS.findOneAndUpdate({Username:req.params.Name},{$pull:{Favorites:req.params.movieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -240,7 +241,7 @@ app.delete('/users/:Name/favs/:movieID',async(req,res)=>
 //below, updates a USER by name...---------------------------------------------------------------------
 app.put('/users/:Name',async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Name:req.params.Name},{$set:{Name:req.body.Name,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
+    await USERS.findOneAndUpdate({Username:req.params.Name},{$set:{Username:req.body.Name,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
     {
         console.error(err);
         res.status(500).send('Error ' + err);
