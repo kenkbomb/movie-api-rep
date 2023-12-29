@@ -5,9 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 
-//let auth = require('./auth')(app);
-//const passport = require('passport');
-//require('./passport');
+
+
 
 const app = express();
 app.use(bodyParser.json()); 
@@ -16,6 +15,7 @@ const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'
 const mongoose = require('mongoose');
 const models = require('./public/models');
 
+
 const MOVIES = models.Movie;
 const USERS = models.User;
 
@@ -23,6 +23,16 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, 
 
 app.use(morgan('combined', {stream: logStream}));
 
+let auth = require('./auth')(app);
+const passport = require('./passport');
+require('passport');
+//const passportLocal =  require('passport-local');
+
+//Above, declares, reqs and setup...
+//------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------
+//Below, URL endpoints... 13 in total
 
 
 // home page..-----------------------------------------------------------
@@ -74,7 +84,7 @@ app.get('/movies/:Title',async(req,res)=>
 })//--------------------------------------------------------------------------------------
 
 //below get ALL movies....--------------------------------------------
-app.get('/movies',async(req,res)=>
+app.get('/movies', passport.authenticate('jwt', { session: false }), async(req,res)=>
 {
     await MOVIES.find().then((movies)=>
     {
