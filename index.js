@@ -1,9 +1,9 @@
 const express = require('express');
-const morgan = require('morgan');
+const morgan = require('morgan');//USED FOR LOGGING
 const uuid = require('uuid');
-const fs = require('fs');
+const fs = require('fs');//REQUIRED TO HELP WITH LOGGING
 const path = require('path');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');//REQUIRED FOR READING/WRITING OF THE DOCUMENT BODY
 
 
 
@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true }));
-const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});
+const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});//REQUIRED FOR LOGGING
 const mongoose = require('mongoose');
 const models = require('./public/models');
 
@@ -21,12 +21,12 @@ const USERS = models.User;
 
 mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
-app.use(morgan('combined', {stream: logStream}));
+app.use(morgan('combined', {stream: logStream}));//USED FOR LOGGING
 
 let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
-//const passportLocal =  require('passport-local');
+
 
 //Above, declares, reqs and setup...
 //------------------------------------------------------------------------------------------------------------
@@ -42,16 +42,16 @@ app.get('/',(req,res)=>
 });//--------------------------------------------------------------------
 
 //below, adds a NEW USER...--------------------------------------------------------------
-
+//DOES NOT USE ANY AUTHENTICATION AND AUTHORIZATION
 app.post('/users', async (req, res) => {
-    await USERS.findOne({ Username:req.body.Name })
+    await USERS.findOne({ Username:req.body.Username })
       .then((user) => {
         if (user) {
-          return res.status(400).send(req.body.Name + ' already exists');
+          return res.status(400).send(req.body.Username + ' already exists');
         } else {
           USERS
             .create({
-              Username: req.body.Name,
+              Username: req.body.Username,
               Password: req.body.Password,
               Email: req.body.Email,
               Birthday: req.body.Birthday
@@ -69,9 +69,8 @@ app.post('/users', async (req, res) => {
       });
   });//------------------------------------------------------------------------------------------------
 
-
 //below, get a MOVIE by title
-app.get('/movies/:Title',async(req,res)=>
+app.get('/movies/:Title',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
     await MOVIES.findOne({Title:req.params.Title}).then((movie)=>
     {
@@ -96,6 +95,7 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), async(req,r
     })
     
 });
+
 //---------------------------------------------------------------------
 //below, just a test endpoint...
 app.get('/tests',(req,res)=>
@@ -105,9 +105,9 @@ app.get('/tests',(req,res)=>
 //---------------------------------------------------------------------
 
 //below,gets a USER by name...-------------------------------------------------------
-app.get('/users/:Name',async(req,res)=>
+app.get('/users/:Username',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
-    await USERS.findOne({Username:req.params.Name}).then((user)=>
+    await USERS.findOne({Username:req.params.Username}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -119,7 +119,7 @@ app.get('/users/:Name',async(req,res)=>
 //-----------------------------------------------------------------------------------
 
 //below, get ALL users...----------------------------------------------
-app.get('/users',async(req,res)=>
+app.get('/users',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
     await USERS.find().then((users)=>
     {
@@ -134,7 +134,7 @@ app.get('/users',async(req,res)=>
 
 
 //below, post a new movie...----------------------------------------------------------------------
-app.post('/movies',async(req,res)=>
+app.post('/movies',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
     await MOVIES.findOne({Title:req.body.Title}).then((movie)=>
     {
@@ -167,9 +167,12 @@ app.post('/movies',async(req,res)=>
 //-----------------------------------------------------------------------------------------------------
 
 //below, adds a new MOVIE to a USERS 'favorites'...-----------------------------------------------------
-app.put('/users/:Name/favs/',async(req,res)=>
+app.put('/users/:Username/favs/',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Name},{$push:{Favorites:req.body.MovieID}},{new:true}).then((user)=>
+    if(req.user.Username !== req.params.Username){
+        return res.status(400).send('Permission denied');
+    }
+    await USERS.findOneAndUpdate({Username:req.params.Username},{$push:{Favorites:req.body.MovieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -181,7 +184,7 @@ app.put('/users/:Name/favs/',async(req,res)=>
 });//-------------------------------------------------------------------------------------------------------
 
 //below, deletes a MOVIE by name...----------------------------------------------------
-app.delete('/movies/:Title',async(req,res)=>
+app.delete('/movies/:Title',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
     await MOVIES.findOneAndDelete({Title:req.params.Title}).then((movie)=>
     {
@@ -200,18 +203,21 @@ app.delete('/movies/:Title',async(req,res)=>
 
 });
 //-------------------------------------------------------------------------------------------------------
-//below, deletes and user by name...
-app.delete('/users/:Name',async(req,res)=>
+//below, deletes a user by name...
+app.delete('/users/:Username',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
-    await USERS.findOneAndDelete({Username:req.params.Name}).then((user)=>
+    if(req.user.Username !== req.params.Username){
+        return res.status(400).send('Permission denied');
+    }
+    await USERS.findOneAndDelete({Username:req.params.Username}).then((user)=>
     {
         if(!user)
         {
-            res.status(400).send(req.params.Name + ' not found!');
+            res.status(400).send(req.params.Username + ' not found!');
         }
         if(user)
         {
-            res.status(200).send(req.params.Name + ' has been removed');
+            res.status(200).send(req.params.Username + ' has been removed');
         }
     }).catch(err=>
         {
@@ -222,9 +228,12 @@ app.delete('/users/:Name',async(req,res)=>
 //-------------------------------------------------------------------------------------------------------
 
 //below, delete a movie/favorite from a USERS favorites...------------------------------------------
-app.delete('/users/:Name/favs/:movieID',async(req,res)=>
+app.delete('/users/:Username/favs/:movieID',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Name},{$pull:{Favorites:req.params.movieID}},{new:true}).then((user)=>
+    if(req.user.Username !== req.params.Username){
+        return res.status(400).send('Permission denied');
+    }
+    await USERS.findOneAndUpdate({Username:req.params.Username},{$pull:{Favorites:req.params.movieID}},{new:true}).then((user)=>
     {
         res.json(user);
     }).catch((err)=>
@@ -239,18 +248,24 @@ app.delete('/users/:Name/favs/:movieID',async(req,res)=>
 //----------------------------------------------------------------------------------------------------
 
 //below, updates a USER by name...---------------------------------------------------------------------
-app.put('/users/:Name',async(req,res)=>
+app.put('/users/:Username',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
-    await USERS.findOneAndUpdate({Username:req.params.Name},{$set:{Username:req.body.Name,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
+    if(req.user.Username !== req.params.Username){
+        return res.status(400).send('Permission denied');
+    }
+    await USERS.findOneAndUpdate({Username:req.params.Username},{$set:{Username:req.body.Username,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
     {
         console.error(err);
         res.status(500).send('Error ' + err);
+    }).then((user)=>
+    {
+        res.json(user);//added this THEN to return the updated user doc to the body, else it seems to hang in postman
     })
-
+    
 });
 //------------------------------------------------------------------------------------------------
 //below, updates a MOVIE by title...--------------------------------------------------------------
-app.put('/movies/:Title',async(req,res)=>
+app.put('/movies/:Title',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
     await MOVIES.findOneAndUpdate({Title:req.params.Title},{$set:{Title:req.body.Title,Director:req.body.Director,Genre:req.body.Genre,Release:req.body.Release,Tagline:req.body.Tagline,Description:req.body.Description}}).then((movie)=>
     {
