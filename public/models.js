@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 let movieSchema = mongoose.Schema({
     Title:{type:String,required:true},
@@ -17,7 +18,19 @@ let userSchema = mongoose.Schema({
     Birthday:{type:Date,required:true},
     Favorites:[{type:mongoose.Schema.Types.ObjectId,ref:'Movie'}]
 })
+//--------------------------------------------------------------------------------------------------------
+//below, code for hashing and validating the users password...
+userSchema.statics.hashPassword = (password)=>
+{
+    return bcrypt.hashSync(password,10);
+}
 
+userSchema.methods.validatePassword = function(password)
+{
+    return bcrypt.compareSync(password,this.password);
+};
+//-------------------------------------------------------------------------------------------------------
+//below, the movie and user schema models to be exported and used elsewhere in the app(index.js)
 const Movie = mongoose.model('Movie',movieSchema);
 const User = mongoose.model("User",userSchema);
 

@@ -3,19 +3,14 @@ const morgan = require('morgan');//USED FOR LOGGING
 const uuid = require('uuid');
 const fs = require('fs');//REQUIRED TO HELP WITH LOGGING
 const path = require('path');
+const { check, validationResult } = require('express-validator');//REQUIRED FOR SERVER SIIDE VALIDATION
 const bodyParser = require('body-parser');//REQUIRED FOR READING/WRITING OF THE DOCUMENT BODY
-
-
-
-
 const app = express();
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true }));
 const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});//REQUIRED FOR LOGGING
 const mongoose = require('mongoose');
 const models = require('./public/models');
-
-
 const MOVIES = models.Movie;
 const USERS = models.User;
 
@@ -23,6 +18,21 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, 
 
 app.use(morgan('combined', {stream: logStream}));//USED FOR LOGGING
 
+//below, CORS logic for domain restriction and access...
+//-------------------------------------------------------------------------------------------------------------
+const cors = require('cors');
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+app.use(cors({
+  origin: (origin, callback) => {
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+      return callback(new Error(message ), false);
+    }
+    return callback(null, true);
+  }
+}));
+//----------------------------------------------------------------------------------------------------------------
 let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
@@ -42,8 +52,19 @@ app.get('/',(req,res)=>
 });//--------------------------------------------------------------------
 
 //below, adds a NEW USER...--------------------------------------------------------------
-//DOES NOT USE ANY AUTHENTICATION AND AUTHORIZATION
-app.post('/users', async (req, res) => {
+//
+app.post('/users',[
+    check('Username', 'Username is required').isLength({min: 5}),
+    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail()
+  ], async (req, res) => {
+    // check the validation object for errors
+  let errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+    let hashedPassword = USERS.hashedPassword(req.body.Password);
     await USERS.findOne({ Username:req.body.Username })
       .then((user) => {
         if (user) {
@@ -52,7 +73,7 @@ app.post('/users', async (req, res) => {
           USERS
             .create({
               Username: req.body.Username,
-              Password: req.body.Password,
+              Password: hashedPassword,
               Email: req.body.Email,
               Birthday: req.body.Birthday
             })
@@ -299,6 +320,14 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
   });
 
-app.listen(8080, () => {
-    console.log('Your app is listening on port 8080.');
-  });
+//app.listen(8080, () => {
+   // console.log('Your app is listening on port 8080.');
+ // });
+
+ 
+
+ const port = process.env.PORT || 8080;
+ app.listen(port, '0.0.0.0',() => {
+  console.log('Listening on Port ' + port);
+ });
+
