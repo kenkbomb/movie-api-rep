@@ -23,7 +23,7 @@ app.use(morgan('combined', {stream: logStream}));//USED FOR LOGGING
 //below, CORS logic for domain restriction and access...
 //-------------------------------------------------------------------------------------------------------------
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com','https://myflixdb-162c62e51cf6.herokuapp.com/'];
 app.use(cors({
   origin: (origin, callback) => {
     if(!origin) return callback(null, true);
@@ -56,7 +56,7 @@ app.get('/',(req,res)=>
 //below, adds a NEW USER...--------------------------------------------------------------
 //
 app.post('/users',[
-    check('Username', 'Username is required').isLength({min: 5}),
+    check('Username', 'Username is required').isLength({min: 2}),
     check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
     check('Password', 'Password is required').not().isEmpty(),
     check('Email', 'Email does not appear to be valid').isEmail()
