@@ -3,7 +3,7 @@ const morgan = require('morgan');//USED FOR LOGGING
 const uuid = require('uuid');
 const fs = require('fs');//REQUIRED TO HELP WITH LOGGING
 const path = require('path');
-const { check, validationResult } = require('express-validator');//REQUIRED FOR SERVER SIIDE VALIDATION
+const { check, validationResult } = require('express-validator');//REQUIRED FOR SERVER SIDE VALIDATION
 const bodyParser = require('body-parser');//REQUIRED FOR READING/WRITING OF THE DOCUMENT BODY
 const app = express();
 app.use(bodyParser.json()); 
@@ -11,19 +11,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});//REQUIRED FOR LOGGING
 const mongoose = require('mongoose');
 const models = require('./public/models');
-const MOVIES = models.Movie;
-const USERS = models.User;
+const MOVIES = models.Movie;//create the movies schema/model access
+const USERS = models.User;//create the user schema/model access
 
 //mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-//mongodb+srv://kenb:natasha84@myflixdb0.syapmhg.mongodb.net/myFlixDB?retryWrites=true&w=majority
+
 
 app.use(morgan('combined', {stream: logStream}));//USED FOR LOGGING
 
 //below, CORS logic for domain restriction and access...
 //-------------------------------------------------------------------------------------------------------------
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com','https://myflixdb-162c62e51cf6.herokuapp.com/'];
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com','http://localhost:1234','https://myflixdb-162c62e51cf6.herokuapp.com/'];
 app.use(cors({
   origin: (origin, callback) => {
     if(!origin) return callback(null, true);
@@ -35,7 +35,7 @@ app.use(cors({
   }
 }));
 //----------------------------------------------------------------------------------------------------------------
-let auth = require('./auth')(app);
+let auth = require('./auth')(app);//should be placed after the bodyparser middleware function.
 const passport = require('passport');
 require('./passport');
 
@@ -50,18 +50,23 @@ require('./passport');
 // home page..-----------------------------------------------------------
 app.get('/',(req,res)=>
 {
-    res.send('hi, welcome to Kens movie night!');
-});//--------------------------------------------------------------------
+    res.send('hi, welcome to Kens movie night!...:)');
+});
+//------------------------------------------------------------------------------------------------
 
 //below, adds a NEW USER...--------------------------------------------------------------
 //
-app.post('/users',[
-    check('Username', 'Username is required').isLength({min: 2}),
+app.post('/users',
+
+/*in the code below, validation logic has been added to a few important fields: username, password, and email. The validation code first ensures that the fields actually contain something (as each field is required); then, it checks that the data within follows the correct format. After these five checkBody functions comes the error-handling function, which puts any errors that occurred into a new variable that’s sent back to the user in a JSON object as an HTTP response. If an error occurs, the rest of the code will not execute, keeping your database safe from any potentially malicious code. In addition, the client is notified of the error, which will allow them to fix it and resubmit their data if it was, in fact, a harmless mistake.*/
+
+  [ check('Username', 'Username is required').isLength({min: 2}),
     check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
     check('Password', 'Password is required').not().isEmpty(),
     check('Email', 'Email does not appear to be valid').isEmail()
-  ], async (req, res) => {
-    // check the validation object for errors
+  ],
+  async (req, res) => {
+     //check the validation object for errors
   let errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
@@ -75,7 +80,7 @@ app.post('/users',[
           USERS
             .create({
               Username: req.body.Username,
-              Password: hashedPassword,
+              Password:hashedPassword,
               Email: req.body.Email,
               Birthday: req.body.Birthday
             })
@@ -142,7 +147,8 @@ app.get('/users/:Username',passport.authenticate('jwt', { session: false }),asyn
 //-----------------------------------------------------------------------------------
 
 //below, get ALL users...----------------------------------------------
-app.get('/users',passport.authenticate('jwt', { session: false }),async(req,res)=>
+app.get('/users',//passport.authenticate('jwt', { session: false }),
+async(req,res)=>
 {
     await USERS.find().then((users)=>
     {
@@ -230,7 +236,8 @@ app.delete('/movies/:Title',passport.authenticate('jwt', { session: false }),asy
 app.delete('/users/:Username',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
     if(req.user.Username !== req.params.Username){
-        return res.status(400).send('Permission denied');
+        console.log('user logged in as: '+ req.user.Username + ' passed this user as param:  ' + req.params.Username);
+        return res.status(400).send('Permission denied, you cannot delete other users');
     }
     await USERS.findOneAndDelete({Username:req.params.Username}).then((user)=>
     {
