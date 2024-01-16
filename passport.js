@@ -14,7 +14,7 @@ npm install jsonwebtoken --save
 
 const passport = require('passport'),                 //passport reqs
   LocalStrategy = require('passport-local').Strategy, //passport reqs
-  Models = require('./public/models'),                //imported from the models.js files
+  Models = require('./models'),                //imported from the models.js files
   passportJWT = require('passport-jwt');              //passport reqs
 
 let Users = Models.User,
@@ -24,8 +24,8 @@ let Users = Models.User,
 passport.use(
   new LocalStrategy(//below, takes in an object with a username and password field
     {
-      usernameField: 'Username',
-      passwordField: 'Password',
+      usernameField: 'username',
+      passwordField: 'password',
     },
     async (username, password, callback) => {
       console.log(`${username} ${password}`);

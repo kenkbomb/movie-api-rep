@@ -22,16 +22,16 @@ let userSchema = mongoose.Schema({
 })
 //--------------------------------------------------------------------------------------------------------
 //below, code for hashing and validating the users password...
-/*
-userSchema.statics.hashPassword = (password)=>
+
+/*userSchema.statics.hashPassword = (password)=>
 {
     return bcrypt.hashSync(password,10);
-}
-*/
-/*userSchema.methods.validatePassword = function(password)
+}*/
+
+userSchema.methods.validatePassword = function(password)
 {
     return bcrypt.compareSync(password,this.password);
-};*/
+};
 
 //-------------------------------------------------------------------------------------------------------
 //below, the movie and user schema models to be exported and used elsewhere in the app(index.js)
