@@ -18,6 +18,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlexDB', { useNewUrlParser: true, 
 //mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
+
+//https://myflixdb-162c62e51cf6.herokuapp.com/users
+//127.0.0.1:8080/users
+
+
+
 app.use(morgan('combined', {stream: logStream}));//USED FOR LOGGING
 
 //below, CORS logic for domain restriction and access...
@@ -71,7 +77,7 @@ app.post('/users',
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
-    //let hashedPassword = USERS.hashPassword(req.body.Password);
+    let hashedPassword = USERS.hashPassword(req.body.Password);
     await USERS.findOne({ Username:req.body.Username })
       .then((user) => {
         if (user) {
@@ -80,7 +86,7 @@ app.post('/users',
           USERS
             .create({
               Username: req.body.Username,
-              Password:req.body.Password,
+              Password:hashedPassword,
               Email: req.body.Email,
               Birthday: req.body.Birthday
             })
