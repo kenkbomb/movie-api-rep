@@ -153,7 +153,7 @@ app.get('/users/:Username',passport.authenticate('jwt', { session: false }),asyn
 //-----------------------------------------------------------------------------------
 
 //below, get ALL users...----------------------------------------------
-app.get('/users',//passport.authenticate('jwt', { session: false }),
+app.get('/users',passport.authenticate('jwt', { session: false }),
 async(req,res)=>
 {
     await USERS.find().then((users)=>
