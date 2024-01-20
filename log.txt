@@ -677,3 +677,6 @@ Timestamp: Wed Nov 22 2023 14:59:32 GMT-0500 (Eastern Standard Time)
 127.0.0.1 - - [20/Jan/2024:01:22:16 +0000] "POST /login HTTP/1.1" 400 68 "-" "PostmanRuntime/7.36.1"
 127.0.0.1 - - [20/Jan/2024:01:26:27 +0000] "POST /login HTTP/1.1" 400 68 "-" "PostmanRuntime/7.36.1"
 127.0.0.1 - - [20/Jan/2024:01:27:20 +0000] "POST /login HTTP/1.1" 200 671 "-" "PostmanRuntime/7.36.1"
+127.0.0.1 - - [20/Jan/2024:01:39:58 +0000] "GET /users HTTP/1.1" 200 2387 "-" "PostmanRuntime/7.36.1"
+127.0.0.1 - - [20/Jan/2024:01:41:14 +0000] "POST /users HTTP/1.1" 201 216 "-" "PostmanRuntime/7.36.1"
+127.0.0.1 - - [20/Jan/2024:01:41:32 +0000] "POST /login HTTP/1.1" 200 675 "-" "PostmanRuntime/7.36.1"
