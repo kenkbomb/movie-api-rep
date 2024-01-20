@@ -11,7 +11,7 @@ let movieSchema = mongoose.Schema({
     Tagline:String,
     Imagepath:String,
     Description:String
-})
+});
 
 let userSchema = mongoose.Schema({
     Username:{type:String,required:true},
@@ -19,18 +19,19 @@ let userSchema = mongoose.Schema({
     Email:{type:String,required:true},
     Birthday:{type:Date,required:true},
     Favorites:[{type:mongoose.Schema.Types.ObjectId,ref:'Movie'}]
-})
+});
 //--------------------------------------------------------------------------------------------------------
 //below, code for hashing and validating the users password...
 
 userSchema.statics.hashPassword = (password)=>
 {
-    return bcrypt.hashSync(password,10);
-}
+    return bcrypt.hashSync(password,50);
+};
 
 userSchema.methods.validatePassword = function(password)
 {
-    return bcrypt.compareSync(password,this.password);
+    console.log(password + '  ' + this.Password);
+    return bcrypt.compareSync(password,this.Password);
 };
 
 //-------------------------------------------------------------------------------------------------------

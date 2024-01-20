@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const logStream = fs.createWriteStream(path.join(__dirname,'log.txt'),{flags:'a'});//REQUIRED FOR LOGGING
 const mongoose = require('mongoose');
-const models = require('./models');
+const models = require('./models.js');
 const MOVIES = models.Movie;//create the movies schema/model access
 const USERS = models.User;//create the user schema/model access
 

@@ -14,7 +14,7 @@ npm install jsonwebtoken --save
 
 const passport = require('passport'),                 //passport reqs
   LocalStrategy = require('passport-local').Strategy, //passport reqs
-  Models = require('./models'),                //imported from the models.js files
+  Models = require('./models.js'),                //imported from the models.js files
   passportJWT = require('passport-jwt');              //passport reqs
 
 let Users = Models.User,
@@ -36,7 +36,15 @@ passport.use(
           return callback(null, false, {
             message: 'Incorrect username or password.',
           });
-        }
+          }
+          //-----------------------------------------TEST-----------------------------------
+          if(user)
+          {
+            console.log(user.Username + ' found!');
+            console.log(user.Password);
+            console.log(password);
+          };
+          //---------------------------------------TEST--------------------------------------
         if(!user.validatePassword(password))
         {
           console.log("incorrect password");
