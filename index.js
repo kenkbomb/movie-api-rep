@@ -117,7 +117,7 @@ app.get('/movies/:Title',passport.authenticate('jwt', { session: false }),async(
 })//--------------------------------------------------------------------------------------
 
 //below get ALL movies....--------------------------------------------
-app.get('/movies', //passport.authenticate('jwt', { session: false }),
+app.get('/movies', passport.authenticate('jwt', { session: false }),
  async(req,res)=>
 {
     await MOVIES.find().then((movies)=>
