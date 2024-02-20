@@ -287,10 +287,11 @@ app.delete('/users/:Username/favs/:movieID',passport.authenticate('jwt', { sessi
 //below, updates a USER by name...---------------------------------------------------------------------
 app.put('/users/:Username',passport.authenticate('jwt', { session: false }),async(req,res)=>
 {
+    //let hashedPassword = USERS.hashPassword(req.body.Password);
     if(req.user.Username !== req.params.Username){
         return res.status(400).send('Permission denied');
     }
-    await USERS.findOneAndUpdate({Username:req.params.Username},{$set:{Username:req.body.Username,Password:req.body.Password,Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
+    await USERS.findOneAndUpdate({Username:req.params.Username},{$set:{Username:req.body.Username,Password:USERS.hashPassword(req.body.Password),Email:req.body.Email,Birthday:req.body.Birthday}},{new:true}).catch((err)=>
     {
         console.error(err);
         res.status(500).send('Error ' + err);
