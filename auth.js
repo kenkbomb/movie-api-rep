@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');//THE PASSPORT MODULE/MIDDLEWARE
 require('./passport.js');//OUR LOCAL PASSPORT.JS FILE
 
-/*The code BELOW first uses the the LocalStrategy you defined in the previous section to check that the username and password in the body of the request exist in the database. If they do, you use the generateJWTToken(); function to create a JWT based on the username and password, which you then send back as a response to the client. If the username and password don’t exist, you return the error message you receive from LocalStrategy back to the client.*/
+/**The code BELOW first uses the the LocalStrategy you defined in the previous section to check that the username and password in the body of the request exist in the database. If they do, you use the generateJWTToken(); function to create a JWT based on the username and password, which you then send back as a response to the client. If the username and password don’t exist, you return the error message you receive from LocalStrategy back to the client.*/
 
 let generateJWTToken = (user)=>
 {

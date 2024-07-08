@@ -21,7 +21,7 @@ let userSchema = mongoose.Schema({
     Favorites:[{type:mongoose.Schema.Types.ObjectId,ref:'Movie'}]
 });
 //--------------------------------------------------------------------------------------------------------
-//below, code for hashing and validating the users password...
+/**below, code for hashing and validating the users password...*/
 
 userSchema.statics.hashPassword = (password)=>
 {
@@ -35,7 +35,7 @@ userSchema.methods.validatePassword = function(password)
 };
 
 //-------------------------------------------------------------------------------------------------------
-//below, the movie and user schema models to be exported and used elsewhere in the app(index.js)
+/**below, the movie and user schema models to be exported and used elsewhere in the app(index.js)*/
 const Movie = mongoose.model('Movie',movieSchema);
 const User = mongoose.model("User",userSchema);
 
