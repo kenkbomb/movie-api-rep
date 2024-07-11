@@ -35,7 +35,7 @@ app.use(morgan('combined', {stream: logStream}));//USED FOR LOGGING
 /**below, CORS logic for domain restriction and access...*/
 //-------------------------------------------------------------------------------------------------------------
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com','http://localhost:1234','https://myflixdb-162c62e51cf6.herokuapp.com/','https://kbomb-flix.netlify.app','http://localhost:4200','http://localhost:4200/','https://kenkbomb.github.io/myFlixAngular/','https://kenkbomb.github.io/myFlixAngular/welcome',""];
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com','http://localhost:1234','https://myflixdb-162c62e51cf6.herokuapp.com/','https://kbomb-flix.netlify.app','http://localhost:4200','http://localhost:4200/','https://kenkbomb.github.io/myFlixAngular/','https://kenkbomb.github.io/myFlixAngular/welcome','https://kenkbomb.github.io/','https://kenkbomb.github.io'];
 app.use(cors({
   origin: (origin, callback) => {
     if(!origin) return callback(null, true);
