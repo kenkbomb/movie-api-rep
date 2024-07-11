@@ -30,7 +30,7 @@ module.exports = (router) => {
         }
         let token = generateJWTToken(user.toJSON());
         return res.json({ user, token });
-        /*This is, in fact, ES6 shorthand for res.json({ user: user, token: token }). With ES6, if your keys are the same as your values, you can use this shorthand.*/
+       
       });
     })(req, res);
   });
