@@ -1,4 +1,4 @@
-/*passport is an authentication middleware for node.js and express.
+/**passport is an authentication middleware for node.js and express.
 It uses blocks of code called strategies to enable certain means of authentication and authorization multiple times throughout your application. Strategies can range from basic HTTP authentication to JWT-based authentication and third party OAuth with specific providers such as Facebook and Google.
 
 npm install passport --save
